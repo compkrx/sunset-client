@@ -44,7 +44,7 @@ Added rows describe implemented scope. Remaining details and missing features ar
 | Spider | Existing capability | Spider |
 | No Slow | Existing capability | No Slow |
 | Safe Walk | Existing capability | Safe Walk |
-| No Clip | Open | Requires implementation and validation |
+| No Clip | Open | Native spectator mode exists; preserving survival state while disabling local and integrated-server collisions remains open. Cyanite also documents multiplayer correction |
 | Fullbright | Existing capability | Fullbright |
 | ESP | Existing capability | ESP |
 | Villager ESP | Extended existing capability | ESP already selects villagers. This PR adds profession/level filters and colors under ESP |
@@ -62,7 +62,7 @@ Added rows describe implemented scope. Remaining details and missing features ar
 | Acid Mode | Open | Requires implementation and validation |
 | Waypoints | Existing capability | Waypoints |
 | Breadcrumbs | Existing capability | Breadcrumbs |
-| Lyrics | Open | Requires implementation and validation |
+| Lyrics | Open | Spotify playback sync and floating timed lyrics remain open |
 | No Hurt Cam | Existing capability | No Render Hide hurt cam |
 | No Fog | Existing capability | No Render fog settings |
 | Fast Place | Existing capability | Fast Place |
@@ -94,7 +94,7 @@ Added rows describe implemented scope. Remaining details and missing features ar
 | Discord RPC | Partial | Horizon has Discord integration. Sunset-specific RPC configuration remains open |
 | Death Position | Existing capability | Death Location and Waypoints |
 | Anti Vanish | Existing capability | Anti Vanish |
-| Anti Mod Check | Open | Requires implementation and validation |
+| Anti Mod Check | Open | Sign/anvil translation and keybind response protection. Client Spoofer's brand settings are a different behavior |
 | Streamer Mode | Existing capability | Streamer Mode |
 | Pets | Open | Requires implementation and validation |
 | Clips | Open | Requires implementation and validation |
@@ -106,7 +106,7 @@ Added rows describe implemented scope. Remaining details and missing features ar
 | Deepslate Bypass | Partial | Storage ESP can mark leaked block-entity metadata. Actual block-model replacement remains open; metadata the server never sends cannot be reconstructed |
 | Sound ESP | Extended existing capability | Sound Detector gains timestamp/count labels, beams, per-event colors, Max Y and a nearby-player exclusion radius |
 | Fake Pay | Open | Requires implementation and validation |
-| Scoreboard Spoof | Open | Requires implementation and validation |
+| Scoreboard Spoof | Open | Local title/line/value replacement. HUD scoreboard positioning already exists |
 | Spawner Finder | Existing capability | Spawner Alerts and Activated Spawner Detector |
 | Relog | Added | One leave/rejoin operation with configurable delay |
 | Depth Alert | Added | Directional height crossing |
@@ -140,12 +140,14 @@ Live Horizon SMP menu titles, lore and confirmation behavior remain to be verifi
 Staff List starts with an empty name list. Configure names and rank words for the server.
 Base Guard defaults to local alerts. Log out is optional, and the ignore list and friends can exclude visitors.
 Chest Index remembers server-provided contents from opened containers. Search highlights saved matches.
+It associates a menu with a recent block-use action; command-opened menus are not attributed to the crosshair's chest.
 Contents can become stale while a container is closed.
 
 ## Sunset UI
 
 Every addition uses Sunset's ClickGUI, module search, right-click settings, bind modes and profiles.
 Auction settings are grouped into Listings, Auction menu, Confirmation and Timing.
+For more room, ClickGUI > Settings > Window opens the existing native settings window.
 Villager settings are inside ESP, metadata settings inside Storage ESP, and sound visuals inside Sound Detector.
 No duplicate FOV, message logger, hole, tunnel, logout spot or generic ESP module is added.
 For the module-list status strings, enable HUD > Module list > Module details.

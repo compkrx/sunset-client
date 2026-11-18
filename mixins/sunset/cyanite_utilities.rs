@@ -55,13 +55,14 @@ struct State {
     retry: Option<Retry>,
     menu: i32,
     opened: Option<[i32; 3]>,
+    interacted: Option<([i32; 3], u64)>,
     containers: Vec<Container>,
 }
 
 impl Default for State {
     fn default() -> Self {
         Self { world: None, last_y: None, staff: HashSet::new(), guarded: HashSet::new(),
-            guard_started: None, retry: None, menu: 0, opened: None, containers: Vec::new() }
+            guard_started: None, retry: None, menu: 0, opened: None, interacted: None, containers: Vec::new() }
     }
 }
 
@@ -126,7 +127,7 @@ fn relog(game: &mut Game<'_>, enabled: bool, delay: f64) {
 
 fn chest_index(game: &mut Game<'_>, m: Option<&Module>) {
     let Some(m) = m else {
-        state(|s| { s.menu = 0; s.opened = None; });
+        state(|s| { s.menu = 0; s.opened = None; s.interacted = None; });
         return;
     };
     let menu = game.remote_menu().0;
@@ -135,10 +136,8 @@ fn chest_index(game: &mut Game<'_>, m: Option<&Module>) {
         return;
     }
     if state(|s| s.menu != menu) {
-        let at = game.pick().map(|h| h.pos).filter(|p| {
-            let name = &game.res.facts().get(game.world.block(p[0], p[1], p[2])).name;
-            listed("chest,trapped_chest,barrel,*shulker_box,hopper,dispenser,dropper,furnace,blast_furnace,smoker", name)
-        });
+        let at = state(|s| s.interacted.take())
+            .filter(|(_, tick)| game.ticks.saturating_sub(*tick) <= 40).map(|(pos, _)| pos);
         state(|s| { s.menu = menu; s.opened = at; });
     }
     let Some(pos) = state(|s| s.opened) else { return };
@@ -179,6 +178,19 @@ fn chest_index(game: &mut Game<'_>, m: Option<&Module>) {
             say(game, &format!("Chest Index could not save: {error}"));
         }
     }
+}
+
+// Associate a menu with the block actually used, rather than whichever chest the
+// crosshair happens to cover when an unrelated /ah or /shop menu opens.
+pub(super) fn sent(game: &Game<'_>, packet: &horizon_protocol::packets::play::Serverbound) {
+    use horizon_protocol::packets::play::Serverbound as S;
+    let S::UseItemOn(p) = packet else { return };
+    if !game.native_window() || !game.native_on(super::sunset::ID)
+        || !super::sunset::with(|s| s.module("Chest Index").is_some_and(|m| m.on))
+    { return; }
+    let name = &game.res.facts().get(game.world.block(p.pos[0], p.pos[1], p.pos[2])).name;
+    let container = listed("chest,trapped_chest,barrel,*shulker_box,hopper,dispenser,dropper,furnace,blast_furnace,smoker", name);
+    state(|s| s.interacted = container.then_some((p.pos, game.ticks)));
 }
 
 pub(super) fn tick(game: &mut Game<'_>, mods: &[Module]) {
